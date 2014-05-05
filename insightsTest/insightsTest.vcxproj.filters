@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="シェーダ">
+      <UniqueIdentifier>{c64cbd5e-1dca-4f9e-ab31-919bf3eb34b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DLL">
+      <UniqueIdentifier>{3b91156c-1f59-4188-96e9-819a16126dee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\PhysX_h">
+      <UniqueIdentifier>{15511d6c-742a-4ad5-be27-207b6f2e5770}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\OpenGL_h">
+      <UniqueIdentifier>{ac4fdeaf-fe15-4087-91d0-16f19955d549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\PhysX_cpp">
+      <UniqueIdentifier>{bec0dfd9-b5b2-4a7c-b8c8-80a370306a0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\OpenGL_cpp">
+      <UniqueIdentifier>{a2660a61-b5f4-4be4-a4f4-0e4d4fa4a109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\OpenGL_cpp\Utils">
+      <UniqueIdentifier>{8c58e5c8-1a34-4a9a-a643-68ebc1108c48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\OpenGL_h\Utils">
+      <UniqueIdentifier>{2d903125-5616-4d37-993a-c5ae167b6abd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PxUserApp.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="kzsGLObject.cpp">
+      <Filter>ソース ファイル\OpenGL_cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="kzsGLSL.cpp">
+      <Filter>ソース ファイル\OpenGL_cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPxShapes.cpp">
+      <Filter>ソース ファイル\PhysX_cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="kzsPhysXFramework.cpp">
+      <Filter>ソース ファイル\PhysX_cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="GLLight.cpp">
+      <Filter>ソース ファイル\OpenGL_cpp\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="kzsGLUtil.cpp">
+      <Filter>ソース ファイル\OpenGL_cpp\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="GLCamera.cpp">
+      <Filter>ソース ファイル\OpenGL_cpp\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="GLMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="InitShader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureAppTest.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="sceneCamera.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GLOBAL_VARIABLES.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PxUserApp.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GLSL\glext.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="kzsGLObject.h">
+      <Filter>ヘッダー ファイル\OpenGL_h</Filter>
+    </ClInclude>
+    <ClInclude Include="kzsGLSL.h">
+      <Filter>ヘッダー ファイル\OpenGL_h</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawPxShapes.h">
+      <Filter>ヘッダー ファイル\PhysX_h</Filter>
+    </ClInclude>
+    <ClInclude Include="kzsPhysXFramework.h">
+      <Filter>ヘッダー ファイル\PhysX_h</Filter>
+    </ClInclude>
+    <ClInclude Include="GLCamera.h">
+      <Filter>ヘッダー ファイル\OpenGL_h\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="kzsGLUtil.h">
+      <Filter>ヘッダー ファイル\OpenGL_h\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="GLLight.h">
+      <Filter>ヘッダー ファイル\OpenGL_h\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="GLMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="mat.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="glew.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureAppTest.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="sceneCamera.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="simple.frag">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="simple.vert">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="glew32.dll">
+      <Filter>DLL</Filter>
+    </None>
+    <None Include="PhysX3CHECKED_x86.dll">
+      <Filter>DLL</Filter>
+    </None>
+    <None Include="PhysX3CommonCHECKED_x86.dll">
+      <Filter>DLL</Filter>
+    </None>
+    <None Include="shader\phong\phong.vert">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="shader\phong\phong.frag">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="shader\gouraud\gouraud.vert">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="shader\gouraud\gouraud.frag">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="shader\cooktorrance\cooktorrance.vert">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="shader\cooktorrance\cooktorrance.frag">
+      <Filter>シェーダ</Filter>
+    </None>
+    <None Include="freeglut.dll">
+      <Filter>DLL</Filter>
+    </None>
+  </ItemGroup>
+</Project>

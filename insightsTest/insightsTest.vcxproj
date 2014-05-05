@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{937F887C-9A54-45AE-AEC4-C2056D1DB693}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>insightsTest</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>C:\Development\PhysX\PhysX-3.2.4_PC_SDK_Core\Bin\win32;C:\Development\Qt\4.8.5\bin;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Development\PhysX\PhysX-3.2.4_PC_SDK_Core\Include;C:\Development\glew;C:\Development\OpenGLMathematics\glm;C:\Development\Qt\4.8.5\include;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Development\PhysX\PhysX-3.2.4_PC_SDK_Core\Samples;C:\Development\PhysX\PhysX-3.2.4_PC_SDK_Core\Include;$(ReferencePath)</ReferencePath>
+    <LibraryPath>C:\Development\PhysX\PhysX-3.2.4_PC_SDK_Core\Lib\win32;C:\Development\glew;C:\Development\freeglut;C:\Development\Qt\4.8.5\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Development\PhysX\PhysX-3.2.4_PC_SDK_Core\Source;C:\Development\Qt\4.8.5\src;$(SourcePath)</SourcePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Development\glew;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Development\glew\glew32.lib;%(AdditionalDependencies);opengl32.lib;glu32.lib;gdi32.lib;user32.lib;winmm.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="DrawPxShapes.cpp" />
+    <ClCompile Include="GLCamera.cpp" />
+    <ClCompile Include="GLLight.cpp" />
+    <ClCompile Include="GLMaterial.cpp" />
+    <ClCompile Include="InitShader.cpp" />
+    <ClCompile Include="kzsGLObject.cpp" />
+    <ClCompile Include="kzsGLSL.cpp" />
+    <ClCompile Include="kzsGLUtil.cpp" />
+    <ClCompile Include="kzsPhysXFramework.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="PxUserApp.cpp" />
+    <ClCompile Include="sceneCamera.cpp" />
+    <ClCompile Include="TextureAppTest.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DrawPxShapes.h" />
+    <ClInclude Include="GLCamera.h" />
+    <ClInclude Include="glew.h" />
+    <ClInclude Include="GLLight.h" />
+    <ClInclude Include="GLMaterial.h" />
+    <ClInclude Include="GLOBAL_VARIABLES.h" />
+    <ClInclude Include="GLSL\glext.h" />
+    <ClInclude Include="kzsGLObject.h" />
+    <ClInclude Include="kzsGLSL.h" />
+    <ClInclude Include="kzsGLUtil.h" />
+    <ClInclude Include="kzsPhysXFramework.h" />
+    <ClInclude Include="mat.h" />
+    <ClInclude Include="PxUserApp.h" />
+    <ClInclude Include="sceneCamera.h" />
+    <ClInclude Include="TextureAppTest.h" />
+    <ClInclude Include="TextureManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="freeglut.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="glew32.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="PhysX3CHECKED_x86.dll" />
+    <None Include="PhysX3CommonCHECKED_x86.dll" />
+    <None Include="shader\cooktorrance\cooktorrance.frag" />
+    <None Include="shader\cooktorrance\cooktorrance.vert" />
+    <None Include="shader\gouraud\gouraud.frag" />
+    <None Include="shader\gouraud\gouraud.vert" />
+    <None Include="shader\phong\phong.frag" />
+    <None Include="shader\phong\phong.vert" />
+    <None Include="simple.frag" />
+    <None Include="simple.vert" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
