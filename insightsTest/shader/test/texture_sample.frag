@@ -9,13 +9,13 @@ in vec3 Normal;
 in vec2 TexCoord;
 
 // 元の値
-in vec3 v10; //vu U軸単位ベクトルに対応したベクトル
-in vec3 v20; //vv V軸単位ベクトルに対応したベクトル
+in vec3 v10; //vu U軸ベクトルに対応したベクトル(正規化していない)
+in vec3 v20; //vv V軸ベクトルに対応したベクトル(正規化していない)
 in vec3 v0c;
 
 // 座標変換後
-in vec3 v10x; //vu U軸単位ベクトルに対応したベクトル
-in vec3 v20x; //vv V軸単位ベクトルに対応したベクトル
+in vec3 v10x; //vu U軸ベクトルに対応したベクトル(正規化していない)
+in vec3 v20x; //vv V軸ベクトルに対応したベクトル(正規化していない)
 in vec3 v0cx;
 
 
@@ -62,12 +62,23 @@ layout( location = 0 ) out vec4 FragColor;
 
 
 // 最小二乗法
-void LeastSquaresMethod(vec3 _v30/*ベクトルの向きに注意*/, vec3 _v10, vec3 _v20, out float _a, out float _b)
+void LeastSquaresMethod(vec3 _v03/*ベクトルの向きに注意*/, vec3 _v10, vec3 _v20, out float _a, out float _b)
 {
   float adbc = dot(_v10,_v10)*dot(_v20,_v20) - dot(_v10,_v20)*dot(_v20,_v10);
-  _a = ( dot(_v20,_v20)*dot(_v30,_v10)-dot(_v20,_v10)*dot(_v30,_v20) ) / adbc;
-  _b = ( dot(_v10,_v10)*dot(_v30,_v20)-dot(_v10,_v20)*dot(_v30,_v10) ) / adbc;
+  _a = ( dot(_v20,_v20)*dot(_v03,_v10)-dot(_v20,_v10)*dot(_v03,_v20) ) / adbc;
+  _b = ( dot(_v10,_v10)*dot(_v03,_v20)-dot(_v10,_v20)*dot(_v03,_v10) ) / adbc;
 }
+
+
+void Refract( vec3 I, vec3 N, float eta, out vec3 result )
+{
+  float k = 1.0 - eta*eta*( 1.0-dot(N,I) * dot(N,I) );
+  if ( k < 0.0 ) // 全反射
+    result = reflect(I,N);
+  else
+    result = eta * I - ( eta * dot(N,I) + sqrt(k) ) * N;
+}
+
 
 void calcLine_Sphere_CrossPointPlus( vec3 v/*LineDir*/, vec3 x/*a point on the line*/,
 				vec3 c/*center of sphere*/, float r/*radius of sphere*/, out vec3 cPoint )
@@ -122,7 +133,8 @@ void calcTexCoordForPupil( vec3 pos, vec3 norm, float radius, out vec2 alteredTe
     calcLine_Sphere_CrossPointPlus (refrac0, firstCrossPoint, centerSphere, radius, secondCrossPoint);
 
     // 相対屈折率<1.0となる場合について全反射を考慮?
-    vec3 refrac1 = refract( refrac0, normalize(secondCrossPoint - centerSphere), nRatio );
+    vec3 refrac1 = refract( refrac0, normalize(centerSphere - secondCrossPoint), nRatio );
+    //Refract( refrac0, normalize(centerSphere - secondCrossPoint), nRatio, refrac1 );
 
     calcLine_Plane_CrossPoint( norm, pos - 2*radius*normalize(norm), secondCrossPoint, refrac1, finalCrossPoint );
   }
@@ -136,30 +148,42 @@ void calcTexCoordForPupil( vec3 pos, vec3 norm, float radius, out vec2 alteredTe
   //vec3 v3 = pos;
   vec3 v3 = finalCrossPoint + 2*radius * normalize(norm);
   //vec3( MVI * vec4( finalCrossPoint + 2*radius * normalize(norm), 1.0 ) );
-  vec3 v30 = v3-v0c;
+  vec3 v03 = v3-v0c;
 
   float adbc = dot(v10,v10)*dot(v20,v20) - dot(v10,v20)*dot(v20,v10);
-  alteredTexCoord.x = ( dot(v20,v20)*dot(v30,v10)-dot(v20,v10)*dot(v30,v20) ) / adbc;
-  alteredTexCoord.y = ( dot(v10,v10)*dot(v30,v20)-dot(v10,v20)*dot(v30,v10) ) / adbc;  
+  alteredTexCoord.x = ( dot(v20,v20)*dot(v03,v10)-dot(v20,v10)*dot(v03,v20) ) / adbc;
+  alteredTexCoord.y = ( dot(v10,v10)*dot(v03,v20)-dot(v10,v20)*dot(v03,v10) ) / adbc;  
   
 }
 
 // 複数の場合
 void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 alteredTexCoord )
 {
+  vec3 incident = normalize( pos - camera );
+  
   // オリジナルを使うときの処理
   // ------ここからミスありそう---------------------------------------------------------------
+  vec3 vU = normalize( v10 );
+  vec3 vV = normalize( v20 );
   vec2 cef; // 係数
   float offset = 2*radius; // 球同士の距離
-  LeastSquaresMethod( v0c-pos,v10*offset,v20*offset,cef.x,cef.y );
-  float a = floor(cef.x);
-  float b = floor(cef.y);
-  vec3 nearestSphere = v0c + v10 *offset*( 0.5 + a ) + v20 *offset*( 0.5 + b ) - normalize(norm)*radius;
-   
+  vec3 posOnPlane; // 球の中心座標のある平面と視線の交わる点
+  calcLine_Plane_CrossPoint( norm, pos-normalize(norm)*radius, pos, incident, posOnPlane );
+  vec3 pos4Calc = posOnPlane + normalize(norm) * radius; // ポリゴン上に戻す
+  /*
+  LeastSquaresMethod( v0c-pos4Calc,vU*offset,vV*offset,cef.x,cef.y );
+  float a = floor(cef.x - 1.0f);
+  float b = floor(cef.y - 1.0f);
+  */
+  vec3 nearestSphere;// = v0c + vU *offset*( 0.5 + a ) + vV *offset*( 0.5 + b ) - normalize(norm)*radius;
+  if ( pos4Calc.x >= 0.0 && pos4Calc.y >= 0.0 ) nearestSphere = vec3(2.5, 2.5, -2.5);
+  else if ( pos4Calc.x >= 0.0 && pos4Calc.y <  0.0 ) nearestSphere = vec3(2.5, -2.5, -2.5);
+  else if ( pos4Calc.x <  0.0 && pos4Calc.y >= 0.0 ) nearestSphere = vec3(-2.5, 2.5, -2.5);
+  else if ( pos4Calc.x <  0.0 && pos4Calc.y <  0.0 ) nearestSphere = vec3(-2.5, -2.5, -2.5);
   // -----------------------------------------------------------------------------------------
   
   vec3 centerSphere = nearestSphere;
-  vec3 incident = normalize( pos - camera );
+  
 
   // 球と視線ベクトルの交差判定（負なら交わらない）
   float judge = pow( dot(incident, camera-centerSphere),2.0 )
@@ -178,7 +202,7 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
     calcLine_Sphere_CrossPointPlus (refrac0, firstCrossPoint, centerSphere, radius, secondCrossPoint);
 
     // 相対屈折率<1.0となる場合について全反射を考慮?
-    vec3 refrac1 = refract( refrac0, normalize(secondCrossPoint - centerSphere), nRatio );
+    vec3 refrac1 = refract( refrac0, normalize(centerSphere - secondCrossPoint), nRatio );
 
     calcLine_Plane_CrossPoint( norm, pos - 2*radius*normalize(norm), secondCrossPoint, refrac1, finalCrossPoint );
   }
@@ -192,11 +216,11 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
   //vec3 v3 = pos;
   vec3 v3 = finalCrossPoint + 2*radius * normalize(norm);
   //vec3( MVI * vec4( finalCrossPoint + 2*radius * normalize(norm), 1.0 ) );
-  vec3 v30 = v3-v0c;
+  vec3 v03 = v3-v0c;
 
   float adbc = dot(v10,v10)*dot(v20,v20) - dot(v10,v20)*dot(v20,v10);
-  alteredTexCoord.x = ( dot(v20,v20)*dot(v30,v10)-dot(v20,v10)*dot(v30,v20) ) / adbc;
-  alteredTexCoord.y = ( dot(v10,v10)*dot(v30,v20)-dot(v10,v20)*dot(v30,v10) ) / adbc;
+  alteredTexCoord.x = ( dot(v20,v20)*dot(v03,v10)-dot(v20,v10)*dot(v03,v20) ) / adbc;
+  alteredTexCoord.y = ( dot(v10,v10)*dot(v03,v20)-dot(v10,v20)*dot(v03,v10) ) / adbc;
 
   //alteredTexCoord = nearestSphere.xy;
   
@@ -227,7 +251,7 @@ void main()
   //phongModel( Position, Normal, ambAndDiff, spec );
   vec2 altTexCoord;
   //calcTexCoordForPupil( originalPos, originalNorm, 5.0, altTexCoord ); // radiusの値に気をつける
-  calcTexCoordForPupil_plural( originalPos, originalNorm, 0.5, altTexCoord ); // radiusの値に気をつける
+  calcTexCoordForPupil_plural( originalPos, originalNorm, 2.5, altTexCoord ); // radiusの値に気をつける
   //calcTexCoordForPupil2( Position, Normal, 5.0, altTexCoord );
   vec4 texColor = texture( Tex1, altTexCoord );
   

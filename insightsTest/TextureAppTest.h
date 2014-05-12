@@ -1,6 +1,8 @@
 #pragma once
 #include "PxUserApp.h"
 
+using glm::normalize;
+
 class TextureAppTest : public PxUserApp
 {
 private:

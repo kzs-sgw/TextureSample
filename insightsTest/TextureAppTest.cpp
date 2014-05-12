@@ -53,9 +53,9 @@ void TextureAppTest::initGL()
 
 	vec2 texCoords[ 6 ] =
 	{
-		vec2( 0.0, 0.0 ), vec2( 1.0, 0.0 ),
-		vec2( 1.0, 1.0 ), vec2( 1.0, 1.0 ),
-		vec2( 0.0, 1.0 ), vec2( 0.0, 0.0 )
+		vec2( 0.0, 0.0 ), vec2( 2.0, 0.0 ),
+		vec2( 2.0, 2.0 ), vec2( 2.0, 2.0 ),
+		vec2( 0.0, 2.0 ), vec2( 0.0, 0.0 )
 	};
 	
 	//----------------------------------------------------------------
@@ -123,7 +123,7 @@ void TextureAppTest::initGL()
 		vec3 vu = p*v10 + q*v20;
 		vec3 vv = r*v10 + s*v20;
 		
-		//cout<<"vu: "<< vu.x <<" "<< vu.y <<" "<< vu.z <<endl;
+		cout<<"vu: "<< vu.x <<" "<< vu.y <<" "<< vu.z <<endl;
 		//cout<<"vv: "<< vv.x <<" "<< vv.y <<" "<< vv.z <<endl;
 
 
@@ -235,7 +235,7 @@ void TextureAppTest::initGL()
 	camera.SetMatrices( shader );
 
 	// Texture Settings
-	TextureManager::Inst()->LoadTexture( "texture/a.jpg", 0 );
+	TextureManager::Inst()->LoadTexture( "texture/spot.jpg", 0 );
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
