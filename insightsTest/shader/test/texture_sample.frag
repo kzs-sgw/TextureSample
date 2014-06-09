@@ -248,10 +248,7 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
 
   float adbc = dot(v10,v10)*dot(v20,v20) - dot(v10,v20)*dot(v20,v10);
   alteredTexCoord.x = ( dot(v20,v20)*dot(v30,v10)-dot(v20,v10)*dot(v30,v20) ) / adbc;
-  alteredTexCoord.y = ( dot(v10,v10)*dot(v30,v20)-dot(v10,v20)*dot(v30,v10) ) / adbc;
-
-  alteredTexCoord = cef;
-  
+  alteredTexCoord.y = ( dot(v10,v10)*dot(v30,v20)-dot(v10,v20)*dot(v30,v10) ) / adbc;  
 }
 
 
@@ -283,8 +280,8 @@ void main()
   //calcTexCoordForPupil2( Position, Normal, 5.0, altTexCoord );
   vec4 texColor = texture( Tex1, altTexCoord );
   
-  //FragColor = 0.7*texColor;
-  FragColor = vec4(altTexCoord.xy/4.0,0.0,1.0);
+  FragColor = 0.7*texColor;
+  //FragColor = vec4(altTexCoord.xy/4.0,0.0,1.0);
   //FragColor = (vec4( ambAndDiff, 1.0 ) * texColor) + vec4(spec, 1.0);
 }
   
