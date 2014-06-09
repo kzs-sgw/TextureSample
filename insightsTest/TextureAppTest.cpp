@@ -53,9 +53,9 @@ void TextureAppTest::initGL()
 
 	vec2 texCoords[ 6 ] =
 	{
-		vec2( 0.0, 0.0 ), vec2( 2.0, 0.0 ),
-		vec2( 2.0, 2.0 ), vec2( 2.0, 2.0 ),
-		vec2( 0.0, 2.0 ), vec2( 0.0, 0.0 )
+		vec2( 0.0, 0.0 ), vec2( 4.0, 0.0 ),
+		vec2( 4.0, 4.0 ), vec2( 4.0, 4.0 ),
+		vec2( 0.0, 4.0 ), vec2( 0.0, 0.0 )
 	};
 	
 	//----------------------------------------------------------------
@@ -124,7 +124,7 @@ void TextureAppTest::initGL()
 		vec3 vv = r*v10 + s*v20;
 		
 		cout<<"vu: "<< vu.x <<" "<< vu.y <<" "<< vu.z <<endl;
-		//cout<<"vv: "<< vv.x <<" "<< vv.y <<" "<< vv.z <<endl;
+		cout<<"vv: "<< vv.x <<" "<< vv.y <<" "<< vv.z <<endl;
 
 
 		for (int j = 0; j < 3; j++)
