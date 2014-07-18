@@ -4,8 +4,8 @@
 #pragma comment(lib, "FreeImage.lib")
 
 
-TextureAppTest::TextureAppTest(void)
-{ 
+TextureAppTest::TextureAppTest(void) //: mesh(true)
+{
 	t=0.0;
 }
 
@@ -36,65 +36,48 @@ void TextureAppTest::initGL()
 	// Axes Initialization
 	initAxes();
 
-	// 構想発表用-----------------------------------------------------
-	vec3 points[6] =
-	{
-		vec3( -5, -5, 0 ), vec3(  5, -5, 0 ),
-		vec3(  5,  5, 0 ), vec3(  5,  5, 0 ),
-		vec3( -5,  5, 0 ), vec3( -5, -5, 0 ) 
-	};
+	// obj data-----------------------------------------------------
+	mesh.ObjLoad( "./obj/cubeSubdived.obj" );
 
-	vec3 normals[ 6 ] =
-	{
-		vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 0.0, 1.0 ),
-		vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 0.0, 1.0 ),
-		vec3( 0.0, 0.0, 1.0 ), vec3( 0.0, 0.0, 1.0 ),
-	};
+	vec3 *points    = new vec3 [ 3*mesh.getNumPolygon() ];
+	vec3 *normals   = new vec3 [ 3*mesh.getNumPolygon() ];
+	vec2 *texCoords = new vec2 [ 3*mesh.getNumPolygon() ];
 
-	vec2 texCoords[ 6 ] =
+	for (int i = 0; i < mesh.getNumPolygon(); i++)
 	{
-		vec2( 0.0, 0.0 ), vec2( 4.0, 0.0 ),
-		vec2( 4.0, 4.0 ), vec2( 4.0, 4.0 ),
-		vec2( 0.0, 4.0 ), vec2( 0.0, 0.0 )
-	};
-	
+		points[i*3]   = mesh.vertex[i*3];
+		points[i*3+1] = mesh.vertex[i*3+1];
+		points[i*3+2] = mesh.vertex[i*3+2];
+	}
+	for (int i = 0; i < mesh.getNumPolygon(); i++)
+	{
+		normals[i*3]   = mesh.normal[i*3];
+		normals[i*3+1] = mesh.normal[i*3+1];
+		normals[i*3+2] = mesh.normal[i*3+2];
+	}
+	for (int i = 0; i < mesh.getNumPolygon(); i++)
+	{
+		texCoords[i*3]   = mesh.texcoord[i*3] * 300.0f ;
+		texCoords[i*3+1] = mesh.texcoord[i*3+1] * 300.0f ;
+		texCoords[i*3+2] = mesh.texcoord[i*3+2] * 300.0f ;
+	}
+
+	for (int i = 0; i < 3*mesh.getNumPolygon(); i++)
+	{
+		//cout<<"points["<< i <<"] "<<points[i].x <<" "<< points[i].y<<" "<<points[i].z <<endl;
+		//cout<<"points["<< i <<"] "<<points[i].x <<" "<< points[i].y<<" "<<normals[i].z <<endl;
+		//cout<<"texCoords["<< i <<"] "<<texCoords[i].x <<" "<< texCoords[i].y <<endl;
+	}
+
 	//----------------------------------------------------------------
-	/*
-	vec3 points[ 600 ];
-	for (int i = 0; i < 10; i++)
-	{
-		for (int j = 0; j < 10; j++)
-		{
-			points[i*60+j*6]   = vec3(-5+j  , -5+i  , 0);
-			points[i*60+j*6+1] = vec3(-5+j+1, -5+i  , 0);
-			points[i*60+j*6+2] = vec3(-5+j+1, -5+i+1, 0);
-			points[i*60+j*6+3] = vec3(-5+j+1, -5+i+1, 0);
-			points[i*60+j*6+4] = vec3(-5+j  , -5+i+1, 0);
-			points[i*60+j*6+5] = vec3(-5+j  , -5+i,   0);
-		}
-		
-	}
-
-	vec3 normals[ 600 ];
-	for (int i = 0; i < 600; i++)
-	{
-		normals[i] = vec3( 0.0, 0.0, 1.0 );
-	}
-
-	vec2 texCoords[ 600 ];
-	for (int i = 0; i < 100; i++)
-	{
-		for (int j = 0; j < 6; j++)
-		{
-			texCoords[i*6+j] = originalTexCoords[j];
-		}
-	}*/
 
 	// for calculation plane:(v0,vu,vv)
-	vec3 planeVec[ 18 ];
+	vec3 *planeVec = new vec3 [ 9 * mesh.getNumPolygon() ];
+	// face normal
+	vec3 *fNormal  = new vec3 [ 3 * mesh.getNumPolygon() ];
 
 	// make unit vector(uv <---> xyz)---------
-	for (int i = 0; i < 2;/*polygons*/ i++)
+	for (int i = 0; i < mesh.getNumPolygon();/*polygons*/ i++)
 	{
 		vec2 u0  = texCoords[i*3];
 		vec2 u10 = texCoords[i*3+1] - u0;
@@ -122,36 +105,38 @@ void TextureAppTest::initGL()
 
 		vec3 vu = p*v10 + q*v20;
 		vec3 vv = r*v10 + s*v20;
-		
-		cout<<"vu: "<< vu.x <<" "<< vu.y <<" "<< vu.z <<endl;
-		cout<<"vv: "<< vv.x <<" "<< vv.y <<" "<< vv.z <<endl;
+		vec3 vc = v0 - texCoords[i*3].x * vu - texCoords[i*3].y * vv;
 
+		//cout<<"vu: "<< vu.x <<" "<< vu.y <<" "<< vu.z <<endl;
+		//cout<<"vv: "<< vv.x <<" "<< vv.y <<" "<< vv.z <<endl;
 
+		// 3頂点に対して
 		for (int j = 0; j < 3; j++)
 		{
-			planeVec[i*9 + j*3]     = v0;
+			planeVec[i*9 + j*3]     = vc;
 			planeVec[i*9 + j*3 + 1] = vu;
 			planeVec[i*9 + j*3 + 2] = vv;
 		}
+
+		// face normal---------------------------------
+		vec3 fN = normalize( glm::cross( v10, v20 ) );
+		fNormal[i*3]     = fN;
+		fNormal[i*3 + 1] = fN;
+		fNormal[i*3 + 2] = fN;
+		// --------------------------------------------
+		
 	}
 
 	//cout<<"planeVec"<<endl;
-	for (int i = 0; i < 18; i++)
+	for (int i = 0; i < 9*mesh.getNumPolygon(); i++)
 	{
-		//cout<< planeVec[i].x <<" "<< planeVec[i].y <<" "<< planeVec[i].z <<endl;
+		//cout<< "planeVec["<< i <<"]" << planeVec[i].x <<" "<< planeVec[i].y <<" "<< planeVec[i].z <<endl;
 	}
 	cout<<"-----------------------------------"<<endl;
 
-	/*
-	vec3 spherePos[200];
-	for (int i = 0; i < 100; i++)
-	{
-		spherePos[i*2] = ( points[i*6]+points[i*6+1]+points[i*6+3]+points[i*6+4] ) * 0.25f;
-		spherePos[i*2+1] = spherePos[i*2];
-		//cout<<spherePos[i*2].x<<", "<<spherePos[i*2].y<<", "<<spherePos[i*2].z<<endl;
-	}*/
 
 	//----------------------------------------
+	//=================================================================================================
 
 
 	GLuint buffer[ 5 ];
@@ -161,23 +146,24 @@ void TextureAppTest::initGL()
 	GLuint normalVBO   = buffer[ 1 ];
 	GLuint texCoordVBO = buffer[ 2 ];
 	GLuint planeVecVBO = buffer[ 3 ];
-	//GLuint spherePosVBO = buffer[ 4 ];
+	GLuint fNormalVBO  = buffer[ 4 ];
 
-	
+	cout<<"polygon number "<<mesh.getNumPolygon()<<endl;
+
 	glBindBuffer( GL_ARRAY_BUFFER, positionVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( points ), points, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*mesh.getNumPolygon(), points, GL_STATIC_DRAW );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, normalVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( normals ), normals, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*mesh.getNumPolygon(), normals, GL_STATIC_DRAW );
 
 	glBindBuffer( GL_ARRAY_BUFFER, texCoordVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( texCoords ), texCoords, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec2 )*3*mesh.getNumPolygon(), texCoords, GL_STATIC_DRAW );
 
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( planeVec ), planeVec, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*9*mesh.getNumPolygon(), planeVec, GL_STATIC_DRAW );
 		
-	//glBindBuffer( GL_ARRAY_BUFFER, spherePosVBO );
-	//glBufferData( GL_ARRAY_BUFFER, sizeof( spherePos ), spherePos, GL_STATIC_DRAW );
+	glBindBuffer( GL_ARRAY_BUFFER, fNormalVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*mesh.getNumPolygon(), fNormal, GL_STATIC_DRAW );
 
 	//----------------------------------------------------------------
 	
@@ -196,17 +182,17 @@ void TextureAppTest::initGL()
 	GLuint pos_loc = shader.getAttribLocation( "vPosition" );
 	glBindBuffer( GL_ARRAY_BUFFER, positionVBO );
 	glEnableVertexAttribArray( pos_loc );
-	glVertexAttribPointer( pos_loc, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+	glVertexAttribPointer( pos_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, 0 );
 
 	GLuint nrm_loc = shader.getAttribLocation( "vNormal" );
 	glBindBuffer( GL_ARRAY_BUFFER, normalVBO );
 	glEnableVertexAttribArray( nrm_loc );
-	glVertexAttribPointer( nrm_loc, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+	glVertexAttribPointer( nrm_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, 0 );
 	
 	GLuint tex_loc = shader.getAttribLocation( "vTexCoord" );
 	glBindBuffer( GL_ARRAY_BUFFER, texCoordVBO );
 	glEnableVertexAttribArray( tex_loc );
-	glVertexAttribPointer( tex_loc, 2, GL_FLOAT, GL_FALSE, 0, 0 );
+	glVertexAttribPointer( tex_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, 0 );
 
 
 	//------------------------------------------------------madayokuwakarann
@@ -219,19 +205,22 @@ void TextureAppTest::initGL()
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
 	glEnableVertexAttribArray( v_loc );
 	glVertexAttribPointer( v_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3)*3, (const void*) sizeof(vec3) );
-
+	 
 	v_loc = shader.getAttribLocation( "v2" );
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
 	glEnableVertexAttribArray( v_loc );
 	glVertexAttribPointer( v_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3)*3, (const void*) (sizeof(vec3)*2) );
 
-
+	GLuint fN_loc = shader.getAttribLocation( "fN" );
+	glBindBuffer( GL_ARRAY_BUFFER, fNormalVBO );
+	glEnableVertexAttribArray( fN_loc );
+	glVertexAttribPointer( fN_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, 0 );
 
 
 	glBindVertexArray( vao[0] );
 
 
-	// Camera Matrices Initialization
+	// Camera Matrices Initialization   
 	camera.SetMatrices( shader );
 
 	// Texture Settings
@@ -245,29 +234,6 @@ void TextureAppTest::initGL()
 	if ( loc >= 0 )	glUniform1i( loc, 0 );
 	else fprintf( stderr, "Uniform Variable \"Tex1\" Not Found!\n" );
 
-
-	//------------------------------------------------------------------------
-	/*
-	// sphere lens position
-	float sphere[75];
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			sphere[ i*15 + j*3     ] = i*2 -4;
-			sphere[ i*15 + j*3 + 1 ] = j*2 -4;
-			sphere[ i*15 + j*3 + 2 ] = 0;
-		}
-	}
-
-	for (int i = 0; i < 25; i++)
-	{
-		cout<< sphere[ i*3 ] << ", " << sphere[ i*3 +1 ] << ", " << sphere[ i*3 +2 ] <<endl; 
-	}
-
-	glUniform1fv( glGetUniformLocation( shader.getHandle(), "sphere" ), 75, sphere );
-	//------------------------------------------------------------------------
-	*/
 
 	glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
@@ -292,9 +258,13 @@ void TextureAppTest::display()
 
 	if ( gScene ) StepPhysX();
 	glClear( GL_COLOR_BUFFER_BIT );//| GL_DEPTH_BUFFER_BIT );
-	
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
 	//-------------------------------------------------
 	// add Object to draw
+	drawAxes();
+
 	shader.BeginShader();
 	camera.updataMatrices();
 	//camera.SetModelViewInv( shader, "MVI" );
@@ -303,17 +273,14 @@ void TextureAppTest::display()
 		<< camera.getCameraPosition().y <<", "
 		<< camera.getCameraPosition().z <<endl;*/
 	shader.setUniform("camera", camera.getCameraPosition() );
-	t+=0.03;
-
-	///注意！！球の半径によって変化する値があります。
-	shader.setUniform("spherePos", vec3(0*cos(t),0*sin(t),-5.0));
+	//t+=0.03;
 
 	TextureManager::Inst()->BindTexture(0);
 	glBindVertexArray( vao[0] );
-	glDrawArrays( GL_TRIANGLES, 0, 6 );
+	glDrawArrays( GL_TRIANGLES, 0, 3*mesh.getNumPolygon() );
 
 	// glUseProgramによって(kzsGLSL)simpleにバインドされます。
-	drawAxes();
+
 
 	//-------------------------------------------------
 	

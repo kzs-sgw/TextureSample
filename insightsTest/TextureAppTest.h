@@ -1,15 +1,18 @@
 #pragma once
 #include "PxUserApp.h"
+#include "ObjParser.h"
 
 using glm::normalize;
 
 class TextureAppTest : public PxUserApp
 {
 private:
-	kzsGLSL	shader;
-	kzsGLSL simple;
-	GLuint	vao[2];
-	float	t;
+
+	ObjParser	mesh;
+	kzsGLSL		shader;
+	kzsGLSL		simple;
+	GLuint		vao[2];
+	float		t;
 
 public:
 	TextureAppTest(void);

@@ -17,14 +17,12 @@ out vec3 Position;
 out vec3 Normal;
 out vec2 TexCoord;
 
-
 out vec3 v10;
 out vec3 v20;
 out vec3 v0c;
 
-out vec3 v10x;
-out vec3 v20x;
-out vec3 v0cx;
+out vec3 fNormal; // face normal
+
 
 uniform cameraMat
 {
@@ -53,9 +51,13 @@ void main()
   v10 = v1;
   v20 = v2;
 
-  v0cx = vec3(ModelViewMatrix *vec4(v0,1.0));
+
+  fNormal = normalize( cross(v1,v2) );
+
+  /*v0cx = vec3(ModelViewMatrix *vec4(v0,1.0));
   v10x = NormalMatrix * v1;
   v20x = NormalMatrix * v2;
+  */
 
   gl_Position = ModelViewProjectionMatrix * vec4( vPosition, 1.0 );
 }
