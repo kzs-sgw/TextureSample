@@ -29,7 +29,7 @@ struct ObjFace
 
 class ObjParser
 {
-private:
+protected:
 	char		objFileName[OBJ_NAME_LENGTH];
 	bool		use_faceNorm;
 	// input vertex data

@@ -94,6 +94,7 @@
     <ClCompile Include="kzsGLUtil.cpp" />
     <ClCompile Include="kzsPhysXFramework.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjModifier.cpp" />
     <ClCompile Include="ObjParser.cpp" />
     <ClCompile Include="PxUserApp.cpp" />
     <ClCompile Include="sceneCamera.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="kzsGLUtil.h" />
     <ClInclude Include="kzsPhysXFramework.h" />
     <ClInclude Include="mat.h" />
+    <ClInclude Include="ObjModifier.h" />
     <ClInclude Include="ObjParser.h" />
     <ClInclude Include="PxUserApp.h" />
     <ClInclude Include="sceneCamera.h" />

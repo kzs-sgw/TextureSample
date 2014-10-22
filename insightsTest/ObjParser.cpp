@@ -9,6 +9,7 @@ ObjParser::ObjParser( bool _use_face_norm )
 
 ObjParser::~ObjParser(void)
 {
+	delete &face;
 }
 
 
@@ -218,6 +219,7 @@ bool ObjParser::ObjLoad( const char* filename )
 		
 	}
 	// --------------------------------------------------------------------------
+
 
 	return true;
 }

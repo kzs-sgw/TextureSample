@@ -65,7 +65,7 @@ void TextureAppTest::initGL()
 	for (int i = 0; i < 3*mesh.getNumPolygon(); i++)
 	{
 		//cout<<"points["<< i <<"] "<<points[i].x <<" "<< points[i].y<<" "<<points[i].z <<endl;
-		//cout<<"points["<< i <<"] "<<points[i].x <<" "<< points[i].y<<" "<<normals[i].z <<endl;
+		//cout<<"normals["<< i <<"] "<<normals[i].x <<" "<< normals[i].y<<" "<<normals[i].z <<endl;
 		//cout<<"texCoords["<< i <<"] "<<texCoords[i].x <<" "<< texCoords[i].y <<endl;
 	}
 
@@ -201,7 +201,7 @@ void TextureAppTest::initGL()
 	glEnableVertexAttribArray( v_loc );
 	glVertexAttribPointer( v_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3)*3, 0 );
 
-	v_loc = shader.getAttribLocation( "v1" );
+	v_loc = shader.getAttribLocation( "v1" ); 
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
 	glEnableVertexAttribArray( v_loc );
 	glVertexAttribPointer( v_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3)*3, (const void*) sizeof(vec3) );
@@ -238,7 +238,12 @@ void TextureAppTest::initGL()
 	glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
 
-
+	// Release
+	delete points;
+	delete normals;
+	delete texCoords;
+	delete planeVec;
+	delete fNormal;
 	
 }
 

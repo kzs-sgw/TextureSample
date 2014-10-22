@@ -13,11 +13,7 @@ in vec3 v10; //vu U軸ベクトルに対応したベクトル(正規化してい
 in vec3 v20; //vv V軸ベクトルに対応したベクトル(正規化していない)
 in vec3 v0c;
 
-// 座標変換後
-in vec3 v10x; //vu U軸ベクトルに対応したベクトル(正規化していない)
-in vec3 v20x; //vv V軸ベクトルに対応したベクトル(正規化していない)
-in vec3 v0cx;
-
+in vec3 fNormal;
 
 //in vec3 spherePos;
 
@@ -60,6 +56,26 @@ uniform MaterialInfo Material;
 
 layout( location = 0 ) out vec4 FragColor;
 
+// rotate
+vec3 rotate(vec3 p, float angle, vec3 axis) // angleはラジアン
+{
+    vec3 a = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float r = 1.0 - c;
+    mat3 m = mat3(
+        a.x * a.x * r + c,
+        a.y * a.x * r + a.z * s,
+        a.z * a.x * r - a.y * s,
+        a.x * a.y * r - a.z * s,
+        a.y * a.y * r + c,
+        a.z * a.y * r + a.x * s,
+        a.x * a.z * r + a.y * s,
+        a.y * a.z * r - a.x * s,
+        a.z * a.z * r + c
+    );
+    return m * p;
+}
 
 // 最小二乗法
 void LeastSquaresMethod(vec3 _v30/*ベクトルの向きに注意*/, vec3 _v10, vec3 _v20, out float _a, out float _b)
@@ -169,15 +185,16 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
   vec3 incident = normalize( pos - camera );
   
   // オリジナルを使うときの処理
-  // ------最初の球を見つける---------------------------------------------------------------
-  vec3 vU = normalize( v10 );
-  vec3 vV = normalize( v20 ); 
+  
+  // ------最初の球を見つける-----------------------------------------------------------------
+  vec3 vU = rotate( v10, acos(dot(fNormal,norm)), cross(fNormal,norm) ); // 線形補間後のテクスチャU軸
+  vec3 vV = rotate( v20, acos(dot(fNormal,norm)), cross(fNormal,norm) ); // 線形補間後のテクスチャU軸
   vec2 cef; // 係数
   float offset = 2*radius; // 球同士の距離
   float pOffset = 0.01*radius; // 平面のオフセット
   float pDist = 0.0; // 仮想平面とポリゴンの距離
   vec3 posOnPlane; // 仮想平面と視線の交わる点
-  vec3 originUV = pos - v10*TexCoord.x - v20*TexCoord.y; // UV座標の原点に対応する空間3次元座標
+  vec3 originUV = pos - vU*TexCoord.x - vV*TexCoord.y; // UV座標の原点に対応する空間3次元座標
   vec3 nearestSphere;
 
   
@@ -186,14 +203,14 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
       /// Normalの処理が必要な可能性あり
       calcLine_Plane_CrossPoint( norm, pos-normalize(norm)*pDist, pos, incident, posOnPlane );
       vec3 pos4Calc = posOnPlane + normalize(norm)*pDist; // ポリゴン上に戻す
-      LeastSquaresMethod( pos4Calc - originUV, v10, v20, cef.x, cef.y ); // pos4CalcのUV値を再計算
+      LeastSquaresMethod( pos4Calc - originUV, vU, vV, cef.x, cef.y ); // pos4CalcのUV値を再計算
       float a, b;
       if ( cef.x >= 0.0 ) a = ( floor(cef.x) + 0.5 );
       else                a = ( ceil (cef.x) - 0.5 );
       if ( cef.y >= 0.0 ) b = ( floor(cef.y) + 0.5 );
       else                b = ( ceil (cef.y) - 0.5 );
 
-      nearestSphere = originUV + v10 * a + v20 * b - normalize(norm)*radius;
+      nearestSphere = originUV + vU * a + vV * b - normalize(norm)*radius;
       
       float judgeC;
       IsCrossing( incident, camera, nearestSphere, radius, judgeC );
@@ -244,11 +261,15 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
   //vec3 v3 = pos;
   vec3 v3 = finalCrossPoint + 2*radius * normalize(norm);
   //vec3( MVI * vec4( finalCrossPoint + 2*radius * normalize(norm), 1.0 ) );
-  vec3 v30 = v3 - v0c; // 計算上v30(v3-v0)の値を入れる。
+  vec3 v30 = v3 - originUV; // 計算上v30(v3-v0)の値を入れる。
 
-  float adbc = dot(v10,v10)*dot(v20,v20) - dot(v10,v20)*dot(v20,v10);
+  /*float adbc = dot(v10,v10)*dot(v20,v20) - dot(v10,v20)*dot(v20,v10);
   alteredTexCoord.x = ( dot(v20,v20)*dot(v30,v10)-dot(v20,v10)*dot(v30,v20) ) / adbc;
   alteredTexCoord.y = ( dot(v10,v10)*dot(v30,v20)-dot(v10,v20)*dot(v30,v10) ) / adbc;
+  */
+  float adbc = dot(vU,vU)*dot(vV,vV) - dot(vU,vV)*dot(vV,vU);
+  alteredTexCoord.x = ( dot(vV,vV)*dot(v30,vU)-dot(vV,vU)*dot(v30,vV) ) / adbc;
+  alteredTexCoord.y = ( dot(vU,vU)*dot(v30,vV)-dot(vU,vV)*dot(v30,vU) ) / adbc;
   
 }
 

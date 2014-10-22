@@ -54,7 +54,6 @@ void callShutdown() {
 }
 
 
-
 //************************************************************
 // **main**
 int main( int argc, char* argv[] )
@@ -73,7 +72,7 @@ int main( int argc, char* argv[] )
 					    callKeyboardFunc,
 					    callIdleFunc,
 						callMouseWheelFunc,
-					    /* Window Title = */ "PxUserAPP" );
+					    /* Window Title = */ "Pseudopupil" );
 
 	delete userApp;
 
