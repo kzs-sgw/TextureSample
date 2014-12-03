@@ -261,27 +261,27 @@ void phongModel( vec3 pos, vec3 norm, out vec3 ambAndDiff, out vec3 spec )
   vec3 r = reflect( -s, norm );
   vec3 ambient = Light.Intensity * Material.Ka;
   float sDotN = max( dot(s,norm), 0.0 );
-  vec3 diffuse = Light.Intensity * Material.Kd * sDotN;
+  vec3 diffuse =  sDotN * vec3(Light.Intensity * Material.Kd);
   spec = vec3(0.0);
   if( sDotN > 0.0 )
     spec = Light.Intensity * Material.Ks *
                pow( max( dot(r,v), 0.0 ), Material.Shininess );
-  //spec = Light.Intensity * Material.Ks * pow( max( dot(r,v), 0.0 ), Material.Shininess );
-
   ambAndDiff = ambient + diffuse;
 }
 
 void main()
 {
-  //vec3 ambAndDiff, spec;
-  //phongModel( Position, Normal, ambAndDiff, spec );
+  vec3 ambAndDiff, spec;
+  phongModel( Position, Normal, ambAndDiff, spec );
   vec2 altTexCoord;
   //calcTexCoordForPupil( originalPos, originalNorm, 5.0, altTexCoord ); // radiusの値に気をつける
-  calcTexCoordForPupil_plural( originalPos, originalNorm, 1.0/24.0, altTexCoord ); // radiusの値に気をつける
+  calcTexCoordForPupil_plural( originalPos, originalNorm, 2.5/24.0, altTexCoord ); // radiusの値に気をつける
   //calcTexCoordForPupil2( Position, Normal, 5.0, altTexCoord );
   vec4 texColor = texture( Tex1, altTexCoord );
   
-  FragColor = 0.7*texColor;
+  FragColor = vec4(ambAndDiff,1.0)*texColor + vec4(spec, 1.0); //*ambAndDiffが正解
+
+
   //FragColor = vec4( normalize(v20), 1.0 );
   //FragColor = vec4(altTexCoord.xy/4.0,0.0,1.0);
   //FragColor = (vec4( ambAndDiff, 1.0 ) * texColor) + vec4(spec, 1.0);

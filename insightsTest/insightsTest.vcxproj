@@ -95,6 +95,8 @@
     <ClCompile Include="kzsPhysXFramework.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjParser.cpp" />
+    <ClCompile Include="PseudopupilInputData.cpp" />
+    <ClCompile Include="PseudopupilInputData_GLM.cpp" />
     <ClCompile Include="PxUserApp.cpp" />
     <ClCompile Include="sceneCamera.cpp" />
     <ClCompile Include="TextureAppTest.cpp" />
@@ -114,6 +116,8 @@
     <ClInclude Include="kzsPhysXFramework.h" />
     <ClInclude Include="mat.h" />
     <ClInclude Include="ObjParser.h" />
+    <ClInclude Include="PseudopupilInputData.h" />
+    <ClInclude Include="PseudopupilInputData_GLM.h" />
     <ClInclude Include="PxUserApp.h" />
     <ClInclude Include="sceneCamera.h" />
     <ClInclude Include="TextureAppTest.h" />

@@ -3,6 +3,7 @@
 #include "TextureManager.h"
 #pragma comment(lib, "FreeImage.lib")
 
+#include "PseudopupilInputData_GLM.h"
 
 TextureAppTest::TextureAppTest(void) //: mesh(true)
 {
@@ -35,10 +36,36 @@ void TextureAppTest::initGL()
 
 	// Axes Initialization
 	initAxes();
+	// Bird Initialization
+	//initBird();
 
 	// obj data-----------------------------------------------------
 	mesh.ObjLoad( "./obj/cubeSubdived.obj" );
+	
+	//----DEBUG-----------------------------
+	PseudopupilInputData_GLM inputData;
+	vec3* point_test    = new vec3[3*mesh.getNumPolygon()];
+	vec3* normal_test   = new vec3[3*mesh.getNumPolygon()];
+	vec2* texcoord_test = new vec2[3*mesh.getNumPolygon()];
 
+	for (int i = 0; i < mesh.getNumPolygon(); i++)
+	{
+		point_test[i*3]   = mesh.vertex[i*3];
+		point_test[i*3+1] = mesh.vertex[i*3+1];
+		point_test[i*3+2] = mesh.vertex[i*3+2];
+
+		normal_test[i*3]   = mesh.normal[i*3];
+		normal_test[i*3+1] = mesh.normal[i*3+1];
+		normal_test[i*3+2] = mesh.normal[i*3+2];
+
+		texcoord_test[i*3]   = mesh.texcoord[i*3];
+		texcoord_test[i*3+1] = mesh.texcoord[i*3+1];
+		texcoord_test[i*3+2] = mesh.texcoord[i*3+2];
+	}
+
+	inputData.makeData( mesh.getNumPolygon(), point_test, normal_test, texcoord_test, 300.0);
+
+	/*
 	vec3 *points    = new vec3 [ 3*mesh.getNumPolygon() ];
 	vec3 *normals   = new vec3 [ 3*mesh.getNumPolygon() ];
 	vec2 *texCoords = new vec2 [ 3*mesh.getNumPolygon() ];
@@ -57,9 +84,9 @@ void TextureAppTest::initGL()
 	}
 	for (int i = 0; i < mesh.getNumPolygon(); i++)
 	{
-		texCoords[i*3]   = mesh.texcoord[i*3] * 300.0f ;
-		texCoords[i*3+1] = mesh.texcoord[i*3+1] * 300.0f ;
-		texCoords[i*3+2] = mesh.texcoord[i*3+2] * 300.0f ;
+		texCoords[i*3]   = mesh.texcoord[i*3] * 150.0f ;
+		texCoords[i*3+1] = mesh.texcoord[i*3+1] * 150.0f ;
+		texCoords[i*3+2] = mesh.texcoord[i*3+2] * 150.0f ;
 	}
 
 	for (int i = 0; i < 3*mesh.getNumPolygon(); i++)
@@ -77,8 +104,8 @@ void TextureAppTest::initGL()
 	vec3 *fNormal  = new vec3 [ 3 * mesh.getNumPolygon() ];
 
 	// make unit vector(uv <---> xyz)---------
-	for (int i = 0; i < mesh.getNumPolygon();/*polygons*/ i++)
-	{
+	for (int i = 0; i < mesh.getNumPolygon();/*polygons*/// i++)
+	/*{
 		vec2 u0  = texCoords[i*3];
 		vec2 u10 = texCoords[i*3+1] - u0;
 		vec2 u20 = texCoords[i*3+2] - u0;
@@ -90,11 +117,7 @@ void TextureAppTest::initGL()
 		q = -u10.y * det_inv;
 		r = -u20.x * det_inv;
 		s =  u10.x * det_inv;
-		/*cout<<"p:"<<p<<endl;
-		cout<<"q:"<<q<<endl;
-		cout<<"r:"<<r<<endl;
-		cout<<"s:"<<s<<endl;*/
-
+		
 		//vec2 check = p*u10 + q*u20;
 		//cout<<"check:"<<check.x<<" "<<check.y<<endl;
 
@@ -133,42 +156,41 @@ void TextureAppTest::initGL()
 		//cout<< "planeVec["<< i <<"]" << planeVec[i].x <<" "<< planeVec[i].y <<" "<< planeVec[i].z <<endl;
 	}
 	cout<<"-----------------------------------"<<endl;
-
+	*/
 
 	//----------------------------------------
 	//=================================================================================================
 
 
-	GLuint buffer[ 5 ];
+	GLuint buffer[ 4 ];
 	
-	glGenBuffers( 5, buffer );
+	glGenBuffers( 4, buffer );
 	GLuint positionVBO = buffer[ 0 ];
 	GLuint normalVBO   = buffer[ 1 ];
 	GLuint texCoordVBO = buffer[ 2 ];
 	GLuint planeVecVBO = buffer[ 3 ];
-	GLuint fNormalVBO  = buffer[ 4 ];
+	//GLuint vuVBO = buffer[ 4 ];
+	//GLuint vvVBO = buffer[ 5 ];	
+
 
 	cout<<"polygon number "<<mesh.getNumPolygon()<<endl;
 
 	glBindBuffer( GL_ARRAY_BUFFER, positionVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*mesh.getNumPolygon(), points, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( float )*3*3*mesh.getNumPolygon(), inputData.points, GL_STATIC_DRAW );
 	
 	glBindBuffer( GL_ARRAY_BUFFER, normalVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*mesh.getNumPolygon(), normals, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( float )*3*3*mesh.getNumPolygon(), inputData.normals, GL_STATIC_DRAW );
 
 	glBindBuffer( GL_ARRAY_BUFFER, texCoordVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( vec2 )*3*mesh.getNumPolygon(), texCoords, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( float )*2*3*mesh.getNumPolygon(), inputData.texCoords, GL_STATIC_DRAW );
 
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*9*mesh.getNumPolygon(), planeVec, GL_STATIC_DRAW );
-		
-	glBindBuffer( GL_ARRAY_BUFFER, fNormalVBO );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*mesh.getNumPolygon(), fNormal, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*9*mesh.getNumPolygon(), inputData.planeVec, GL_STATIC_DRAW );
 
 	//----------------------------------------------------------------
 	
 	// GLSL shader Initialization
-	shader.initShaderProgram( "shader/test/texture_sample.vert", "shader/test/texture_sample.frag" );
+	shader.initShaderProgram( "shader/test/pseudopupil.vert", "shader/test/pseudopupil.frag" );
 	printf( "---main shader---\n" );
 	shader.printActiveAttribs();
 	shader.printActiveUniforms();
@@ -195,26 +217,21 @@ void TextureAppTest::initGL()
 	glVertexAttribPointer( tex_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, 0 );
 
 
-	//------------------------------------------------------madayokuwakarann
-	GLuint v_loc = shader.getAttribLocation( "v0" );
+	//------------------------------------------------------
+	GLuint v_loc = shader.getAttribLocation( "vc" );
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
 	glEnableVertexAttribArray( v_loc );
 	glVertexAttribPointer( v_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3)*3, 0 );
 
-	v_loc = shader.getAttribLocation( "v1" );
+	v_loc = shader.getAttribLocation( "vu" );
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
 	glEnableVertexAttribArray( v_loc );
 	glVertexAttribPointer( v_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3)*3, (const void*) sizeof(vec3) );
 	 
-	v_loc = shader.getAttribLocation( "v2" );
+	v_loc = shader.getAttribLocation( "vv" );
 	glBindBuffer( GL_ARRAY_BUFFER, planeVecVBO );
 	glEnableVertexAttribArray( v_loc );
 	glVertexAttribPointer( v_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3)*3, (const void*) (sizeof(vec3)*2) );
-
-	GLuint fN_loc = shader.getAttribLocation( "fN" );
-	glBindBuffer( GL_ARRAY_BUFFER, fNormalVBO );
-	glEnableVertexAttribArray( fN_loc );
-	glVertexAttribPointer( fN_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, 0 );
 
 
 	glBindVertexArray( vao[0] );
@@ -245,7 +262,7 @@ void TextureAppTest::initGL()
 
 void TextureAppTest::display()
 {
-	shader.setUniform("Light.Position", vec4(0.0f,0.0f,5.0f,1.0f) );
+	shader.setUniform("Light.Position", vec4(20.0f,30.0f,30.0f,1.0f) );
 	shader.setUniform("Light.Intensity", vec3(1.0f, 1.0f, 1.0f) );
     shader.setUniform("Material.Kd", 0.9f, 0.9f, 0.9f);
     shader.setUniform("Material.Ks", 0.95f, 0.95f, 0.95f);
@@ -257,13 +274,14 @@ void TextureAppTest::display()
 	
 
 	if ( gScene ) StepPhysX();
-	glClear( GL_COLOR_BUFFER_BIT );//| GL_DEPTH_BUFFER_BIT );
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glEnable(GL_DEPTH_TEST);
+	//glCullFace(GL_BACK);
 
 	//-------------------------------------------------
 	// add Object to draw
 	drawAxes();
+	//drawBird();
 
 	shader.BeginShader();
 	camera.updataMatrices();
@@ -273,6 +291,7 @@ void TextureAppTest::display()
 		<< camera.getCameraPosition().y <<", "
 		<< camera.getCameraPosition().z <<endl;*/
 	shader.setUniform("camera", camera.getCameraPosition() );
+	simple4bird.setUniform("camera", camera.getCameraPosition() );
 	//t+=0.03;
 
 	TextureManager::Inst()->BindTexture(0);
@@ -479,3 +498,185 @@ void TextureAppTest::testAffine()
 	cout<< p.x <<" "<<p.y<<" "<<p.z<<endl;
 	cout<<""<<endl;
 }
+
+
+
+//==========================================================================
+// rurikakesu(bird)
+//
+void TextureAppTest::initBird()
+{
+	/*bird.ObjLoad( "./obj/3d_ruri_01.obj" );
+
+	simple4bird.initShaderProgram( "shader/test/simple.vert", "shader/test/simple.frag" );
+	printf("---Simple4bird Shader---\n" );
+	simple4bird.printActiveAttribs();
+	simple4bird.printActiveUniforms();
+	
+	vec3 points[6];
+	for (int i = 0; i < 2; i++)
+	{
+		points[i*3]   = bird.vertex[i*3];
+		points[i*3+1] = bird.vertex[i*3+1];
+		points[i*3+2] = bird.vertex[i*3+2];
+	}
+
+	vec3 colors[6]=
+	{
+		vec3(1.0f,1.0f,0.0f), vec3(1.0f,1.0f,0.0f),
+		vec3(0.0f,1.0f,1.0f), vec3(0.0f,1.0f,1.0f),
+		vec3(1.0f,0.0f,1.0f), vec3(1.0f,0.0f,1.0f)
+	};
+
+	GLuint buffer[2];
+
+	glGenBuffers(2, buffer);
+	GLuint posVBO = buffer[0];
+	GLuint colVBO = buffer[1];
+
+	glBindBuffer( GL_ARRAY_BUFFER, posVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW );
+	
+	glBindBuffer( GL_ARRAY_BUFFER, colVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW );
+	
+	glGenVertexArrays( 1, &vao[2] );
+	glBindVertexArray( vao[2] );
+
+	GLuint pos_loc = simple4bird.getAttribLocation( "vPosition" );
+	glBindBuffer( GL_ARRAY_BUFFER, posVBO );
+	glEnableVertexAttribArray( pos_loc );
+	glVertexAttribPointer( pos_loc, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+
+	GLuint col_loc = simple4bird.getAttribLocation( "vColor" );
+	glBindBuffer( GL_ARRAY_BUFFER, colVBO );
+	glEnableVertexAttribArray( col_loc );
+	glVertexAttribPointer( col_loc, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+
+	glBindVertexArray( vao[2] );
+	
+	camera.SetMatrices( simple4bird );
+	
+	*/
+
+
+
+
+
+
+	// obj data-----------------------------------------------------
+	bird.ObjLoad( "./obj/3d_ruri_01.obj" );
+
+	vec3 *points    = new vec3 [ 3*bird.getNumPolygon() ];
+	vec3 *normals   = new vec3 [ 3*bird.getNumPolygon() ];
+	vec2 *texCoords = new vec2 [ 3*bird.getNumPolygon() ];
+	vec3 *colors    = new vec3 [ 3*bird.getNumPolygon() ];
+
+	for (int i = 0; i < bird.getNumPolygon(); i++)
+	{
+		points[i*3]   = bird.vertex[i*3];
+		points[i*3+1] = bird.vertex[i*3+1];
+		points[i*3+2] = bird.vertex[i*3+2];
+	}
+	for (int i = 0; i < bird.getNumPolygon(); i++)
+	{
+		normals[i*3]   = bird.normal[i*3];
+		normals[i*3+1] = bird.normal[i*3+1];
+		normals[i*3+2] = bird.normal[i*3+2];
+	}
+	for (int i = 0; i < bird.getNumPolygon(); i++)
+	{
+		texCoords[i*3]   = bird.texcoord[i*3]  ;
+		texCoords[i*3+1] = bird.texcoord[i*3+1];
+		texCoords[i*3+2] = bird.texcoord[i*3+2];
+	}
+	for (int i = 0; i < bird.getNumPolygon(); i++)
+	{
+		colors[i*3]   = vec3(1.0,0.0,1.0);
+		colors[i*3+1] = vec3(1.0,0.0,1.0);
+		colors[i*3+2] = vec3(1.0,0.0,1.0);
+	}
+
+
+	simple4bird.initShaderProgram( "shader/test/simple.vert", "shader/test/simple.frag" );
+	printf("---Simple4bird Shader---\n" );
+	simple4bird.printActiveAttribs();
+	simple4bird.printActiveUniforms();
+	
+
+
+	
+	GLuint buffer[ 4 ];
+	
+	glGenBuffers( 4, buffer );
+	GLuint positionVBO = buffer[ 0 ];
+	GLuint normalVBO   = buffer[ 1 ];
+	GLuint texCoordVBO = buffer[ 2 ];
+	GLuint colorVBO    = buffer[ 3 ];
+
+	cout<<"polygon number "<<bird.getNumPolygon()<<endl;
+
+	glBindBuffer( GL_ARRAY_BUFFER, positionVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*bird.getNumPolygon(), points, GL_STATIC_DRAW );
+	
+	glBindBuffer( GL_ARRAY_BUFFER, normalVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*bird.getNumPolygon(), normals, GL_STATIC_DRAW );
+
+	glBindBuffer( GL_ARRAY_BUFFER, texCoordVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec2 )*3*bird.getNumPolygon(), texCoords, GL_STATIC_DRAW );
+	
+	glBindBuffer( GL_ARRAY_BUFFER, colorVBO );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vec3 )*3*bird.getNumPolygon(), colors, GL_STATIC_DRAW );
+	//----------------------------------------------------------------
+	
+	// GLSL shader Initialization
+	simple4bird.initShaderProgram( "shader/test/pseudopupil.vert", "shader/test/pseudopupil.frag" );
+	printf( "---main shader---\n" );
+	simple4bird.printActiveAttribs();
+	simple4bird.printActiveUniforms();
+	simple4bird.BeginShader();
+
+
+	// VBO Settings
+	glGenVertexArrays( 1, &vao[2] );
+	glBindVertexArray( vao[2] );
+
+	GLuint pos_loc = simple4bird.getAttribLocation( "vPosition" );
+	glBindBuffer( GL_ARRAY_BUFFER, positionVBO );
+	glEnableVertexAttribArray( pos_loc );
+	glVertexAttribPointer( pos_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, 0 );
+
+	/*GLuint nrm_loc = simple4.getAttribLocation( "vNormal" );
+	glBindBuffer( GL_ARRAY_BUFFER, normalVBO );
+	glEnableVertexAttribArray( nrm_loc );
+	glVertexAttribPointer( nrm_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, 0 );
+	
+	GLuint tex_loc = simple4bird.getAttribLocation( "vTexCoord" );
+	glBindBuffer( GL_ARRAY_BUFFER, texCoordVBO );
+	glEnableVertexAttribArray( tex_loc );
+	glVertexAttribPointer( tex_loc, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, 0 );*/
+
+	GLuint col_loc = simple4bird.getAttribLocation( "vColor" );
+	glBindBuffer( GL_ARRAY_BUFFER, colorVBO );
+	glEnableVertexAttribArray( col_loc );
+	glVertexAttribPointer( col_loc, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, 0 );
+
+	glBindVertexArray( vao[2] );
+	
+	camera.SetMatrices( simple4bird );
+
+	/*delete points;
+	delete normals;
+	delete texCoords;*/
+
+}
+
+void TextureAppTest::drawBird()
+{
+	simple4bird.BeginShader();
+	glBindVertexArray( vao[2] );
+	glDrawArrays( GL_TRIANGLES, 0, 3*bird.getNumPolygon() );
+}
+
+
+//==========================================================================
