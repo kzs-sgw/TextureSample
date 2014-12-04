@@ -105,7 +105,7 @@ void calcLine_Plane_CrossPoint( vec3 n/*planeNormal*/, vec3 x/*pointOnPlane*/,
 
 
 // 複数の場合
-void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 alteredTexCoord )
+void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 alteredTexCoord, out vec3 normal4phong )
 {
   vec3 incident = normalize( pos - camera );
   
@@ -159,6 +159,10 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
     vec3 firstCrossPoint;
     calcLine_Sphere_CrossPointMinus(incident, camera, centerSphere, radius, firstCrossPoint);
 
+    // phongシェーディング用の法線を出力
+    normal4phong = normalize( mat3(ModelViewMatrix) * normalize(firstCrossPoint - centerSphere ) );
+    
+
     vec3 refrac0 = refract( incident, normalize(firstCrossPoint - centerSphere) , 1.0/nRatio );
     vec3 secondCrossPoint;
     calcLine_Sphere_CrossPointPlus (refrac0, firstCrossPoint, centerSphere, radius, secondCrossPoint);
@@ -170,6 +174,8 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
   }
   else
   {
+    normal4phong = normalize( Normal ); // phongシェーディング用の法線を出力
+    
     // 視線と仮想平面の交点を直接求める。
     calcLine_Plane_CrossPoint( norm, pos - 2*radius*normalize(norm), pos, incident, finalCrossPoint );
   }
@@ -206,13 +212,16 @@ void phongModel( vec3 pos, vec3 norm, out vec3 ambAndDiff, out vec3 spec )
 
 void main()
 {
-  vec3 ambAndDiff, spec;
-  phongModel( Position, Normal, ambAndDiff, spec );
-
   vec2 altTexCoord;
-  calcTexCoordForPupil_plural( originalPos, originalNorm, 1.0/24.0, altTexCoord ); // radiusの値に気をつける
+  vec3 norm4phong;
+  calcTexCoordForPupil_plural( originalPos, originalNorm, .5/10.0, altTexCoord, norm4phong ); // radiusの値に気をつける
 
   vec4 texColor = texture( Tex1, altTexCoord );
+
+  vec3 ambAndDiff, spec;
+  
+  phongModel( Position, Normal, ambAndDiff, spec );
+
   
   FragColor = vec4(ambAndDiff,1.0)*texColor + vec4(spec, 1.0);
   //FragColor = vec4( Normal, 1.0);

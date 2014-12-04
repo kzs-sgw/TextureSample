@@ -40,7 +40,7 @@ void TextureAppTest::initGL()
 	//initBird();
 
 	// obj data-----------------------------------------------------
-	mesh.ObjLoad( "./obj/cubeSubdived.obj" );
+	mesh.ObjLoad( "./obj/sagawa_tori_wing_obj.obj" );
 	
 	//----DEBUG-----------------------------
 	PseudopupilInputData_GLM inputData;
@@ -270,6 +270,7 @@ void TextureAppTest::display()
     shader.setUniform("Material.Shininess", 100.0f);
 
 
+	//camera.SetTargetPosition( vec3( 0.0f, 0.0f, 15.0f) );
 	camera.SetCameraPosition( vec3( 20 * sin( 0.0 ), 20, 20 * cos( 0.0 ) ) );
 	
 

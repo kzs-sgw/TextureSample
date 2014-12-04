@@ -16,7 +16,7 @@ sceneCamera::sceneCamera(void)
 
 	oldX  = 0;
 	oldY  = 0;
-	camera_state = 0;
+	camera_state = NONE;
 	rX    = 0;
 	rY    = -50;
 	dist  = 1;
@@ -35,7 +35,7 @@ void sceneCamera::SetCameraPosition( vec3 cPos )
 
 void sceneCamera::SetTargetPosition( vec3 tPos )
 {
-	targetPos = tPos;
+	targetPos = -tPos;
 }
 
 void sceneCamera::SetViewUpVector( vec3 vuVec )
@@ -171,21 +171,39 @@ void sceneCamera::InMouse( int button, int state, int x, int y )
 	{
 		oldX = x;
 		oldY = y;
+
+		switch (button)
+		{
+		case GLUT_LEFT_BUTTON: camera_state = LEFT_BUTTON_DOWN;
+			break;
+		case GLUT_RIGHT_BUTTON: camera_state = RIGHT_BUTTON_DOWN;
+			break;
+		case GLUT_MIDDLE_BUTTON: camera_state = MIDDLE_BUTTON_DOWN;
+			std::cout<<"middle button clicked\n";
+			break;
+		default: camera_state = NONE;
+			break;
+		}
 	}
-		if( button == GLUT_RIGHT_BUTTON )
-		camera_state = 1;
-	else camera_state = 0;
+	
 }
 
 void sceneCamera::InMotion( int x, int y, bool doRedisplay )
 {
-	if ( camera_state == 1 )
+	if ( camera_state == RIGHT_BUTTON_DOWN )
 	{
 		rY += ( x - oldX )/5.0f;
 		rX += ( y - oldY )/5.0f;
 	}
-		oldX = x;
+	oldX = x;
 	oldY = y;
+
+	if ( camera_state == LEFT_BUTTON_DOWN )
+	{
+		targetPos.z += ( y - oldX )/500.0f;
+		std::cout<< targetPos.z <<std::endl;
+	}
+
 	if ( doRedisplay )	glutPostRedisplay();
 }
 

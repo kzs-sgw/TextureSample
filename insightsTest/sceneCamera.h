@@ -32,7 +32,13 @@ private:
 
 	int			oldX;
 	int			oldY;
-	int			camera_state;
+	enum		Camera_State
+				{	
+					NONE,
+					LEFT_BUTTON_DOWN,
+					RIGHT_BUTTON_DOWN,
+					MIDDLE_BUTTON_DOWN
+				} camera_state;
 
 	float		rX;
 	float		rY;
