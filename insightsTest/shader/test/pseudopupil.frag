@@ -13,8 +13,11 @@ in vec3 v10; //vu U軸ベクトルに対応したベクトル(正規化してい
 in vec3 v20; //vv V軸ベクトルに対応したベクトル(正規化していない)
 in vec3 v0c;
 
-
+uniform sampler2D Tex0;
 uniform sampler2D Tex1;
+uniform sampler2D Tex2;
+uniform sampler2D Tex3;
+
 uniform vec3 camera;
 
 uniform cameraMat
@@ -25,8 +28,15 @@ uniform cameraMat
   //mat4 ProjectionMatrix;
 };
 
+
+uniform bool isManThere;
+uniform vec3 angluar;
+uniform float radius;
+uniform int time;
+
+
 float nRatio = 1.491;
-   
+  
 //---------------------------------------------------------------
 
 struct LightInfo
@@ -214,9 +224,14 @@ void main()
 {
   vec2 altTexCoord;
   vec3 norm4phong;
-  calcTexCoordForPupil_plural( originalPos, originalNorm, .5/10.0, altTexCoord, norm4phong ); // radiusの値に気をつける
+  calcTexCoordForPupil_plural( originalPos, originalNorm, radius, altTexCoord, norm4phong ); // radiusの値に気をつける
 
-  vec4 texColor = texture( Tex1, altTexCoord );
+  vec4 texColor;
+  if(time == 0) texColor = texture( Tex0, altTexCoord );
+  if(time == 1) texColor = texture( Tex1, altTexCoord );
+  if(time == 2) texColor = texture( Tex2, altTexCoord );
+  if(time == 3) texColor = texture( Tex3, altTexCoord );
+
 
   vec3 ambAndDiff, spec;
   

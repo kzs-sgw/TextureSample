@@ -1,6 +1,8 @@
 #pragma once
 #include "PxUserApp.h"
 #include "ObjParser.h"
+#include "TextureManager.h"
+#pragma comment(lib, "FreeImage.lib")
 
 using glm::normalize;
 
@@ -13,6 +15,9 @@ private:
 	kzsGLSL		simple;
 	GLuint		vao[3];
 	float		t;
+	float		meshRadius;
+
+	//TextureManager_beta texManager;
 
 	// rurikakesu(bird)
 	ObjParser	bird;
@@ -25,6 +30,7 @@ public:
 
 	void initGL();
 	void display();
+	void idle();
 
 	// for debug
 	void initAxes();

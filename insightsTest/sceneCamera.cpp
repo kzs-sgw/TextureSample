@@ -201,7 +201,7 @@ void sceneCamera::InMotion( int x, int y, bool doRedisplay )
 	if ( camera_state == LEFT_BUTTON_DOWN )
 	{
 		targetPos.z += ( y - oldX )/500.0f;
-		std::cout<< targetPos.z <<std::endl;
+		//std::cout<< targetPos.z <<std::endl;
 	}
 
 	if ( doRedisplay )	glutPostRedisplay();

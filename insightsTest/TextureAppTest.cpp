@@ -1,7 +1,7 @@
 #include "TextureAppTest.h"
 
-#include "TextureManager.h"
-#pragma comment(lib, "FreeImage.lib")
+//#include "TextureManager_beta.h"
+//#pragma comment(lib, "FreeImage.lib")
 
 #include "PseudopupilInputData_GLM.h"
 
@@ -40,8 +40,10 @@ void TextureAppTest::initGL()
 	//initBird();
 
 	// obj data-----------------------------------------------------
-	mesh.ObjLoad( "./obj/sagawa_tori_wing_obj.obj" );
-	
+	mesh.ObjLoad( "./obj/sagawa_tori_lip_obj.obj" );
+	meshRadius = .5f/16.0;
+
+
 	//----DEBUG-----------------------------
 	PseudopupilInputData_GLM inputData;
 	vec3* point_test    = new vec3[3*mesh.getNumPolygon()];
@@ -63,7 +65,7 @@ void TextureAppTest::initGL()
 		texcoord_test[i*3+2] = mesh.texcoord[i*3+2];
 	}
 
-	inputData.makeData( mesh.getNumPolygon(), point_test, normal_test, texcoord_test, 300.0);
+	inputData.makeData( mesh.getNumPolygon(), point_test, normal_test, texcoord_test, 100.0);
 
 	/*
 	vec3 *points    = new vec3 [ 3*mesh.getNumPolygon() ];
@@ -241,16 +243,59 @@ void TextureAppTest::initGL()
 	camera.SetMatrices( shader );
 
 	// Texture Settings
-	TextureManager::Inst()->LoadTexture( "texture/spot.jpg", 0 );
+
+	
+	// texture0---------------------------------------------------------------
+	glActiveTexture(GL_TEXTURE0);
+	TextureManager::Inst()->LoadTexture( "texture/yoichiro2.jpg", 0 , GL_BGR); // FreeImageの仕様?(BGR)
+	TextureManager::Inst()->BindTexture(0);
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
 	// sampler uniform settings
-	int loc = glGetUniformLocation( shader.getHandle(), "Tex1" );
+	int loc = glGetUniformLocation( shader.getHandle(), "Tex0" );
 	if ( loc >= 0 )	glUniform1i( loc, 0 );
+	else fprintf( stderr, "Uniform Variable \"Tex0\" Not Found!\n" );
+	
+	// texture1---------------------------------------------------------------
+	glActiveTexture(GL_TEXTURE1);
+	TextureManager::Inst()->LoadTexture( "texture/yoichiro4.jpg", 1 , GL_BGR); // FreeImageの仕様?(BGR)
+	TextureManager::Inst()->BindTexture(1);
+
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+	// sampler uniform settings
+	loc = glGetUniformLocation( shader.getHandle(), "Tex1" );
+	if ( loc >= 0 )	glUniform1i( loc, 1 );
 	else fprintf( stderr, "Uniform Variable \"Tex1\" Not Found!\n" );
 
+	// texture2---------------------------------------------------------------
+	glActiveTexture(GL_TEXTURE2);
+	TextureManager::Inst()->LoadTexture( "texture/yoichiro5.jpg", 2 , GL_BGR); // FreeImageの仕様?(BGR)
+	TextureManager::Inst()->BindTexture(2);
+
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+	// sampler uniform settings
+	loc = glGetUniformLocation( shader.getHandle(), "Tex2" );
+	if ( loc >= 0 )	glUniform1i( loc, 2 );
+	else fprintf( stderr, "Uniform Variable \"Tex2\" Not Found!\n" );
+
+	// texture3---------------------------------------------------------------
+	glActiveTexture(GL_TEXTURE3);
+	TextureManager::Inst()->LoadTexture( "texture/yoichiro6.jpg", 3 , GL_BGR); // FreeImageの仕様?(BGR)
+	TextureManager::Inst()->BindTexture(3);
+
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+	// sampler uniform settings
+	loc = glGetUniformLocation( shader.getHandle(), "Tex3" );
+	if ( loc >= 0 )	glUniform1i( loc, 3 );
+	else fprintf( stderr, "Uniform Variable \"Tex3\" Not Found!\n" );
 
 	glClearColor( 0.0, 0.0, 0.0, 1.0 );
 
@@ -292,10 +337,12 @@ void TextureAppTest::display()
 		<< camera.getCameraPosition().y <<", "
 		<< camera.getCameraPosition().z <<endl;*/
 	shader.setUniform("camera", camera.getCameraPosition() );
-	simple4bird.setUniform("camera", camera.getCameraPosition() );
-	//t+=0.03;
-
-	TextureManager::Inst()->BindTexture(0);
+	shader.setUniform("radius", meshRadius);
+	int s = t/4;
+	shader.setUniform("time", s);
+	
+	
+	//TextureManager::Inst()->BindTexture(0);
 	glBindVertexArray( vao[0] );
 	glDrawArrays( GL_TRIANGLES, 0, 3*mesh.getNumPolygon() );
 
@@ -307,6 +354,13 @@ void TextureAppTest::display()
 	//glUtil.RenderFramerate( WINDOW_WIDTH, WINDOW_HEIGHT );
 
 	glutSwapBuffers();
+}
+
+
+void TextureAppTest::idle()
+{
+	t+=0.3;
+	glutPostRedisplay();
 }
 
 
