@@ -122,6 +122,7 @@
     <ClInclude Include="sceneCamera.h" />
     <ClInclude Include="TextureAppTest.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="README.txt" />

@@ -45,8 +45,8 @@ public:
 	void			mouse ( int button, int s, int x, int y );
 	void			motion( int x, int y );
 	virtual void	display();
-	void			idle();
-	void			keyboard( unsigned char key, int x, int y );
+	virtual void	idle();
+	virtual void	keyboard( unsigned char key, int x, int y );
 	void			mousewheel( int wheel_number, int direction, int x, int y );
 	virtual void	initGL();
 
@@ -61,7 +61,7 @@ public:
 	kzsGLSL			testShader;
 	sceneCamera		camera;
 
-	
+	string window_title;
 
 };
 

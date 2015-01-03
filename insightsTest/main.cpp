@@ -66,6 +66,7 @@ int main( int argc, char* argv[] )
 
 	atexit( callShutdown );
 
+
 	userApp->runOpenGL( callDisplayFunc,
 		                callResizeFunc,
 				        callMouseFunc,
@@ -73,7 +74,7 @@ int main( int argc, char* argv[] )
 					    callKeyboardFunc,
 					    callIdleFunc,
 						callMouseWheelFunc,
-					    /* Window Title = */ "PxUserAPP" );
+					    /* Window Title = */ "pseudopupil" );
 
 	delete userApp;
 

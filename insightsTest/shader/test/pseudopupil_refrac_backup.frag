@@ -85,7 +85,7 @@ void IsCrossing( vec3 v/*LineDir*/, vec3 x/*a point on the line*/,
 }
 
 
-void calcLine_Sphere_CrossPointPlus( vec3 v/*LineDir*/, vec3 x/*a point on the line*/,
+void calcLine_Sphere_CrossPointFar( vec3 v/*LineDir*/, vec3 x/*a point on the line*/,
 				vec3 c/*center of sphere*/, float r/*radius of sphere*/, out vec3 cPoint )
 {
   float D = pow( dot(v,x-c), 2.0) - dot(v,v) * ( dot(x-c,x-c) - r*r );
@@ -95,7 +95,7 @@ void calcLine_Sphere_CrossPointPlus( vec3 v/*LineDir*/, vec3 x/*a point on the l
 }
 
 
-void calcLine_Sphere_CrossPointMinus( vec3 v/*LineDir*/, vec3 x/*a point on the line*/,
+void calcLine_Sphere_CrossPointNear( vec3 v/*LineDir*/, vec3 x/*a point on the line*/,
 				vec3 c/*center of sphere*/, float r/*radius of sphere*/, out vec3 cPoint )
 {
   float D = pow( dot(v,x-c), 2.0) - dot(v,v) * ( dot(x-c,x-c) - r*r );
@@ -125,14 +125,14 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
   vec3 vU = normalize( v10 );
   vec3 vV = normalize( v20 ); 
   vec2 cef; // 係数
-  float offset = 2*radius; // 球同士の距離
-  float pOffset = 0.01*radius; // 平面のオフセット
-  float pDist = 0.0; // 仮想平面とポリゴンの距離
+  float offset     = 2*radius; // 球同士の距離
+  float pOffset    = 0.01*radius; // 平面のオフセット
+  float pDist      = 0.0; // 仮想平面とポリゴンの距離
   vec3 posOnPlane; // 仮想平面と視線の交わる点
-  vec3 originUV = pos - v10*TexCoord.x - v20*TexCoord.y; // UV座標の原点に対応する空間3次元座標
+  vec3 originUV    = pos - v10*TexCoord.x - v20*TexCoord.y; // UV座標の原点に対応する空間3次元座標
   vec3 nearestSphere;
+  bool isFirstSphereCrossing = false;
 
-  
   for( pDist = 0; pDist <= radius; pDist += pOffset )
     {
       /// Normalの処理が必要な可能性あり
@@ -149,46 +149,45 @@ void calcTexCoordForPupil_plural( vec3 pos, vec3 norm, float radius, out vec2 al
       
       float judgeC;
       IsCrossing( incident, camera, nearestSphere, radius, judgeC );
-      if ( judgeC >= 0.0 ) break;
-
-      cef = vec2(a,b);
-
+      if ( judgeC >= 0.0 )
+	{
+	  isFirstSphereCrossing = true;
+	  break;
+	}
     } 
   // -----------------------------------------------------------------------------------------
   // ------屈折処理---------------------------------------------------------------------------
+  vec3 finalCrossPoint; // テクスチャ平面との最終交点
   
-  vec3 centerSphere = nearestSphere;
-
-  // 球と視線ベクトルの交差判定（負なら交わらない）
-  float judge;
-  IsCrossing( incident, camera, centerSphere, radius, judge );
-
-  vec3 finalCrossPoint; // 仮想平面との最終交点
-  
-  if ( judge >= 0.0 )
+  if ( !isFirstSphereCrossing )
   {
-    vec3 firstCrossPoint;
-    calcLine_Sphere_CrossPointMinus(incident, camera, centerSphere, radius, firstCrossPoint);
-
-    // phongシェーディング用の法線を出力
-    normal4phong = normalize( mat3(ModelViewMatrix) * normalize(firstCrossPoint - centerSphere ) );
-    
-
-    vec3 refrac0 = refract( incident, normalize(firstCrossPoint - centerSphere) , 1.0/nRatio );
-    vec3 secondCrossPoint;
-    calcLine_Sphere_CrossPointPlus (refrac0, firstCrossPoint, centerSphere, radius, secondCrossPoint);
-
-    // 相対屈折率<1.0となる場合について全反射を考慮?
-    vec3 refrac1 = refract( refrac0, normalize(centerSphere - secondCrossPoint), nRatio );
-
-    calcLine_Plane_CrossPoint( norm, pos - 2*radius*normalize(norm), secondCrossPoint, refrac1, finalCrossPoint );
-  }
-  else
-  {
-    normal4phong = normalize( Normal ); // phongシェーディング用の法線を出力
+    //normal4phong = normalize( Normal ); // phongシェーディング用の法線を出力
     
     // 視線と仮想平面の交点を直接求める。
     calcLine_Plane_CrossPoint( norm, pos - 2*radius*normalize(norm), pos, incident, finalCrossPoint );
+  }
+  else
+  {
+    vec3 centerSphere = nearestSphere;
+    vec3 nearCrossPoint;
+    calcLine_Sphere_CrossPointNear(incident, camera, centerSphere, radius, nearCrossPoint);
+
+    // phongシェーディング用の法線を出力
+    //normal4phong = normalize( mat3(ModelViewMatrix) * normalize(nearCrossPoint - centerSphere ) );
+
+    vec3 refracOut;
+    vec3 farCrossPoint;
+    vec3 refracIn = refract( incident, normalize(nearCrossPoint - centerSphere) , 1.0/nRatio );
+    calcLine_Sphere_CrossPointFar (refracIn, nearCrossPoint, centerSphere, radius, farCrossPoint);
+    
+    // 相対屈折率<1.0となる場合について全反射を考慮? ****追記：フレネル反射を利用？****
+    refracOut = refract( refracIn, normalize(centerSphere - farCrossPoint), nRatio );
+
+    //---------------------------------------------
+    
+    //---------------------------------------------
+    
+    calcLine_Plane_CrossPoint( norm, pos - 2*radius*normalize(norm), farCrossPoint, refracOut, finalCrossPoint );
   }
   // -----------------------------------------------------------------------------------------
   

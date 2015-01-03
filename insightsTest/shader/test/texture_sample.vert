@@ -11,7 +11,7 @@ layout ( location = 4 ) in vec3 v1;
 layout ( location = 5 ) in vec3 v2;
 
 out vec3 originalPos;
-out vec3 originalNorm;
+out vec3 originalNorm; 
 
 out vec3 Position;
 out vec3 Normal;

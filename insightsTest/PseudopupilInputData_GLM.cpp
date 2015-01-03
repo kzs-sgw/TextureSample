@@ -57,7 +57,7 @@ void PseudopupilInputData_GLM::makeData(int numPolygon, glm::vec3* vertex_, glm:
 		s =  u10.x * det_inv;
 		/*cout<<"p:"<<p<<endl;
 		cout<<"q:"<<q<<endl;
-		cout<<"r:"<<r<<endl;
+		cout<<"r:"<<r<<endl; 
 		cout<<"s:"<<s<<endl;*/
 
 		//vec2 check = p*u10 + q*u20;

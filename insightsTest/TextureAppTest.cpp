@@ -5,9 +5,11 @@
 
 #include "PseudopupilInputData_GLM.h"
 
-TextureAppTest::TextureAppTest(void) //: mesh(true)
+TextureAppTest::TextureAppTest(void) : ofs("D:/output_text/test.txt")
 {
 	t=0.0;
+	num_screenshot = 0;
+	canWriteText = false;
 }
 
 
@@ -19,7 +21,7 @@ TextureAppTest::~TextureAppTest(void)
 void TextureAppTest::initGL()
 {
 
-	//----------------------------------------------------------------	
+	//----------------------------------------------------------------
 	ActivateGLSL();
 
 	kzsGLObject::initGL();
@@ -32,6 +34,13 @@ void TextureAppTest::initGL()
 	//cout << "【拡張機能一覧】"<<endl;
 	//cout << glGetString(GL_EXTENSIONS) <<endl;
 	cout << endl;
+	
+	typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
+	PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;
+	wglSwapIntervalEXT = 
+		(PFNWGLSWAPINTERVALFARPROC)wglGetProcAddress("wglSwapIntervalEXT");
+	if (wglSwapIntervalEXT)
+		wglSwapIntervalEXT(0);
 	//----------------------------------------------------------------
 
 	// Axes Initialization
@@ -40,8 +49,9 @@ void TextureAppTest::initGL()
 	//initBird();
 
 	// obj data-----------------------------------------------------
-	mesh.ObjLoad( "./obj/sagawa_tori_lip_obj.obj" );
-	meshRadius = .5f/16.0;
+	mesh.ObjLoad( "./obj/3d_ruri_01.obj" );
+	float texReso = 100.0;
+	meshRadius = 7.5/texReso;
 
 
 	//----DEBUG-----------------------------
@@ -65,7 +75,7 @@ void TextureAppTest::initGL()
 		texcoord_test[i*3+2] = mesh.texcoord[i*3+2];
 	}
 
-	inputData.makeData( mesh.getNumPolygon(), point_test, normal_test, texcoord_test, 100.0);
+	inputData.makeData( mesh.getNumPolygon(), point_test, normal_test, texcoord_test, texReso);
 
 	/*
 	vec3 *points    = new vec3 [ 3*mesh.getNumPolygon() ];
@@ -192,7 +202,7 @@ void TextureAppTest::initGL()
 	//----------------------------------------------------------------
 	
 	// GLSL shader Initialization
-	shader.initShaderProgram( "shader/test/pseudopupil.vert", "shader/test/pseudopupil.frag" );
+	shader.initShaderProgram( "shader/test/pseudopupil.vert", "shader/test/pseudopupil_refrac_new.frag" );
 	printf( "---main shader---\n" );
 	shader.printActiveAttribs();
 	shader.printActiveUniforms();
@@ -247,7 +257,7 @@ void TextureAppTest::initGL()
 	
 	// texture0---------------------------------------------------------------
 	glActiveTexture(GL_TEXTURE0);
-	TextureManager::Inst()->LoadTexture( "texture/yoichiro2.jpg", 0 , GL_BGR); // FreeImageの仕様?(BGR)
+	TextureManager::Inst()->LoadTexture( "texture/spot.jpg", 0 , GL_BGR); // FreeImageの仕様?(BGR)
 	TextureManager::Inst()->BindTexture(0);
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -273,7 +283,7 @@ void TextureAppTest::initGL()
 
 	// texture2---------------------------------------------------------------
 	glActiveTexture(GL_TEXTURE2);
-	TextureManager::Inst()->LoadTexture( "texture/yoichiro5.jpg", 2 , GL_BGR); // FreeImageの仕様?(BGR)
+	TextureManager::Inst()->LoadTexture( "texture/yoichiro6.jpg", 2 , GL_BGR); // FreeImageの仕様?(BGR)
 	TextureManager::Inst()->BindTexture(2);
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -286,7 +296,7 @@ void TextureAppTest::initGL()
 
 	// texture3---------------------------------------------------------------
 	glActiveTexture(GL_TEXTURE3);
-	TextureManager::Inst()->LoadTexture( "texture/yoichiro6.jpg", 3 , GL_BGR); // FreeImageの仕様?(BGR)
+	TextureManager::Inst()->LoadTexture( "texture/yoichiro5.jpg", 3 , GL_BGR); // FreeImageの仕様?(BGR)
 	TextureManager::Inst()->BindTexture(3);
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -307,6 +317,8 @@ void TextureAppTest::initGL()
 
 void TextureAppTest::display()
 {
+	Timer timer; // 実行時間計測
+
 	shader.setUniform("Light.Position", vec4(20.0f,30.0f,30.0f,1.0f) );
 	shader.setUniform("Light.Intensity", vec3(1.0f, 1.0f, 1.0f) );
     shader.setUniform("Material.Kd", 0.9f, 0.9f, 0.9f);
@@ -316,7 +328,7 @@ void TextureAppTest::display()
 
 
 	//camera.SetTargetPosition( vec3( 0.0f, 0.0f, 15.0f) );
-	camera.SetCameraPosition( vec3( 20 * sin( 0.0 ), 20, 20 * cos( 0.0 ) ) );
+	camera.SetCameraPosition( vec3( 15 * sin( -90 + t ), 15 * 0, 15 * cos( -90 + t ) ) );
 	
 
 	if ( gScene ) StepPhysX();
@@ -338,8 +350,9 @@ void TextureAppTest::display()
 		<< camera.getCameraPosition().z <<endl;*/
 	shader.setUniform("camera", camera.getCameraPosition() );
 	shader.setUniform("radius", meshRadius);
-	int s = t/4;
+	int s = (int)t%4;
 	shader.setUniform("time", s);
+	shader.setUniform("value_test", t);
 	
 	
 	//TextureManager::Inst()->BindTexture(0);
@@ -354,15 +367,57 @@ void TextureAppTest::display()
 	//glUtil.RenderFramerate( WINDOW_WIDTH, WINDOW_HEIGHT );
 
 	glutSwapBuffers();
+
+
+	//if ( canWriteText )
+	//{
+	//	ofs << to_string(t) << " " << to_string( 1.0/timer.elapsed() ) <<endl;
+	//	canWriteText = false;
+	//}
+	//if (t < 30) ofs << to_string( timer.elapsed() * 10000 ) <<endl;
+	if (t < 100) ofs << to_string(t) << " " << to_string( 1.0 /timer.elapsed() ) <<endl;
+	//cout<<"fps: "<< to_string( 1.0 /timer.elapsed() ) <<endl;
+	if (t < 3)
+	{
+		char filename[100];
+		sprintf( filename, "D:/screenshots/screenshot%03d.bmp", num_screenshot++);
+		CaptureScreen( filename );
+	}
+	
 }
 
 
 void TextureAppTest::idle()
 {
-	t+=0.3;
+	t+=0.2;
 	glutPostRedisplay();
 }
 
+
+void TextureAppTest::keyboard( unsigned char key, int x, int y )
+{
+	switch ( key ) {
+		case '\033':
+			exit( 0 );
+			break;
+
+		case 'n':
+			glUtil.toggleFaceDirection();
+			break;
+
+		case 'x':
+			char filename[100];
+			sprintf( filename, "D:/screenshots/screenshot%03d.bmp", num_screenshot++);
+			CaptureScreen( filename );
+			break;
+
+		case 'w':
+			canWriteText = true;
+			break;
+		default:
+			break;  
+	}
+}
 
 //===============================================================
 // for debug
